@@ -58,8 +58,8 @@ plt.axvline(x=0, ymin=0, ymax=0)  ## shows the x=0 line in graph
 plt.axhline(y=0, xmin=0, xmax=0)  ## shows the y=0 line in graph
 
 plt.title(" Freq vs Amp", fontdict = font)
-plt.xlabel("Frequency", fontdict = font)
-plt.ylabel("Amplitude", fontdict = font)
+plt.xlabel("Frequency(Hz)", fontdict = font)
+plt.ylabel("Amplitude(mm)", fontdict = font)
 
 plt.tight_layout()
 plt.legend()
