@@ -1,0 +1,81 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import math
+
+def fft(data,sampling_frequency):
+    fft = np.fft.fft(data) #gives complex numbers
+    N = len(data)
+    fft = np.abs(fft)/N #taking magnitude and normalizing
+
+    f = np.linspace(0,200,N) #frequency domain
+    
+    half = int(N/2)+1 #fft can represent upto the sampling frequency/2
+    a = 2*fft[0:half] 
+    f = f[0:half]
+    
+    a[0] = a[0]/2 #dc component doesnot need to be multiply by 2
+    
+    df = pd.DataFrame(np.array([f,a]).transpose())
+    df.columns = ['f','a']
+    
+    a_cutoff = df['a'].max() * 0.01
+    temp = df[df.a>a_cutoff]
+    f_cutoff = temp.iloc[-1]['f']
+    df = df[df.f<f_cutoff]
+    return df
+
+def find_bandwidth(df):
+    
+    peak = df['a'].max()
+    cutoff = peak/math.sqrt(2)
+    df = df[df.a>=cutoff]
+       
+    return df
+    
+    mass = 400
+freq = ['0.25', '0.5', '0.75', '1', '1.25','1.5', '1.75', '2', '2.25', '2.5', '2.75', '3', '3.25', '3.5', '3.75', '4']
+
+# err = {}
+
+# df_err = pd.DataFrame(err)
+# df_err.columns['Freq/ mass', '50', '100', '150']
+
+
+def get_inp_max(fft_inp):
+    
+    ai_max = fft_inp['a'].max()
+    index = np.where(fft_inp['a'] == ai_max)[0][0]
+    fi_max = fft_inp['f'][index]
+    
+    return ai_max, fi_max
+
+
+def get_out_max(fft_out):
+    
+    ao_max = fft_out['a'].max()
+    index = np.where(fft_out['a'] == ao_max)[0][0]
+    fo_max = fft_out['f'][index]
+    
+    return ao_max, fo_max
+
+
+for f in freq:
+    data = pd.read_csv(str(mass) + ' kg' + '/' + str(f) + '.csv')
+    inp = data['input(mm)']
+    out = data['output(mm)']
+    
+    fft_inp = fft(inp,200)
+    fft_out = fft(out,200)
+    
+    ai_max, fi_max = get_inp_max(fft_inp)
+    ao_max, fo_max = get_out_max(fft_out)
+    
+    a_err_per = abs(((ai_max - ao_max)/ai_max) *  100)
+    f_err_per = abs(((fi_max - fo_max)/fi_max) *  100)
+
+
+    print(a_err_per, f_err_per)
+    
+    
+   
