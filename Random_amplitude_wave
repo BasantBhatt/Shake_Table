@@ -1,0 +1,66 @@
+##### amplitude for different frequency with mass= 0 #####
+import csv
+
+# Define the file name
+filename = 'M0_all_data_file.csv'
+
+# Define the column headers
+fields = ['f', 'a']
+
+# Define the value ranges for f and a columns
+f_range = [round(x / 10, 1) for x in range(5, 81)]
+a_range = list(range(150, 0, -5))
+
+a_limit = [150,133.3,114.3,100.0,88.9,80.0,72.7,66.7,61.5,57.1,53.3,50.0,47.1,44.4,42.1,40.0,38.1,36.4,34.8,33.3,32.0,30.8,29.6,28.6,27.6,26.7,25.8,25.0,24.2,23.5,22.9,22.2,21.6,21.1,20.5,20.0,19.5,19.0,18.6,18.2,17.8,17.4,17.0,16.7,16.3,16.0,15.7,15.4,15.1,14.8,14.5,14.3,14.0,13.8,13.6,13.3,13.1,12.9,12.7,12.5,12.3,12.1,11.9,11.8,11.6,11.4,11.3,11.1,11.0,10.8,10.7,10.5,10.4,10.3,10.1,10.0]
+
+# Create and write data to the CSV file
+with open(filename, 'w', newline='') as file:
+    writer = csv.writer(file)
+    writer.writerow(fields)
+    
+    i = 0
+    for f in f_range:
+        for a in a_range:
+            if a <= a_limit[i]:
+                writer.writerow([f, a])
+        i += 1
+        
+# Print confirmation message
+print(f"Data has been written to '{filename}' successfully!")
+
+
+####### Different Amplitude value for different Mass with varying frequency #########
+
+import csv
+
+# Open the file in write mode
+with open('different_mass_amplitude.csv', mode='w', newline='') as file:
+    
+    # Create a writer object
+    writer = csv.writer(file)
+    
+    # Write the header row
+    writer.writerow(['f', 'a0', 'a50', 'a100', 'a150', 'a200', 'a250', 'a300', 'a350', 'a400', 'a450', 'a500'])
+    
+    # Loop over the values of f from 0.5 to 8 with an increment of 0.1
+    for f in range(5, 81, 1):
+        
+        # Create an empty list to store the values for the current row
+        row = []
+        
+        # Append the value of f to the row
+        row.append(f / 10)
+        
+        # Loop over the values of m from 0 to 500 with an increment of 50
+        for m in range(0, 501, 50):
+            
+            # Calculate the value of a for the current value of f and m
+            a = 2000 / (f / 10 * (25 + m))
+            
+            # Append the value of a to the row
+            row.append(a)
+        
+        # Write the row to the CSV file
+        writer.writerow(row)
+        
+print("your file have been created")
