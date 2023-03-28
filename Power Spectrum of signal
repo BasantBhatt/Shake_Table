@@ -1,0 +1,109 @@
+###### Chat GPT Estimate power spectral density 
+
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy import signal
+import math
+
+# Generate a test signal
+# t = np.linspace(0, 10, 200)
+# x = np.sin(2*np.pi*1.75*t)*40
+
+
+t = np.arange(0,10,0.005)
+x = np.sin(2*math.pi*1.75*t)*40
+
+
+# Compute the power spectrum
+f, Pxx = signal.periodogram(x, fs=200)
+
+# Plot the power spectrum
+plt.plot(f[0:30], Pxx[0:30])
+plt.xlabel('Frequency [Hz]')
+plt.ylabel('Power spectrum')
+plt.show()
+
+
+
+
+###### Chat GPT power spectral density (ali accurate)
+
+import numpy as np
+from scipy import signal
+import matplotlib.pyplot as plt
+
+# Generate a signal
+fs = 200  # Sample rate
+f = 1.75 #Frequency
+t = np.arange(0, 10, 1/fs)
+x = np.sin(2*np.pi*f*t)*40
+
+# Calculate power spectral density
+frequencies, power_spectrum = signal.welch(x, fs=fs, nperseg=1024)
+
+# Plot power spectral density
+plt.plot(frequencies[0:15], power_spectrum[0:15])
+plt.xlabel('Frequency (Hz)')
+plt.ylabel('Power/Frequency (dB/Hz)')
+plt.title('Power Spectral Density')
+plt.show()
+
+
+
+###### YouTube power spectrum
+
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy import signal
+import math
+from numpy.fft import fft, fftfreq, ifft
+
+
+###### importing the our data
+t = np.linspace(0, 10, 200, endpoint=False)
+inp = np.sin(2*np.pi*1.75*t)*40
+
+
+# df = pd.read_csv('1.25.csv')
+# t = df['time (ms)']
+# inp = df['input(mm)']
+# inp = df['output(mm)']
+
+n_i = len(inp)
+
+freqs = fftfreq(n_i)
+mask = freqs>0
+
+#### FFT and power spectrum clculation
+fft_vals = fft(inp)
+
+fft_theo = 2*np.abs(fft_vals/n_i)
+ps = 2*(np.abs(fft_vals/n_i)**2) ### calculating power spectrum form fft data
+
+## Cross checks
+mean_inp = np.mean(inp)
+std_inp = np.std(inp)
+var_inp = std_inp **2
+print(mean_inp, std_inp, var_inp)
+
+sum_ps = np.sum(ps[mask])
+print(sum_ps)
+
+
+
+# plt.figure(1)
+# plt.plot(t, inp, label = 'input')
+# plt.xlabel('time')
+# plt.ylabel('amplitude')
+# plt.legend()
+# plt.show()
+
+
+plt.figure(2)
+# plt.plot(freqs[mask], fft_theo[mask], label = 'input')
+plt.plot(freqs[mask], ps[mask], label = 'power_spectra')
+
+plt.xlabel('frequency')
+plt.ylabel('Spectra')
+plt.legend()
+plt.show()
