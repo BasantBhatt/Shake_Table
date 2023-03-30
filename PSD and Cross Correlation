@@ -1,0 +1,99 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.ticker import ScalarFormatter
+from scipy import signal
+import pandas as pd
+import csv
+
+###### importing the our data
+df = pd.read_csv('1.25.csv')
+t = df['time (ms)']
+inp = df['input(mm)']
+out = df['output(mm)']
+max(inp)
+
+#### Plotting graph of our data
+plt.figure(figsize=(15, 4))
+plt.plot(t, inp, label= 'input')
+plt.plot(t, out, label = 'output')
+plt.xlabel('time(ms)')
+plt.ylabel('Amplitude(mm)')
+plt.legend()
+plt.show()
+
+####### Compute the power spectral density
+
+# f1, Pxx1 = signal.periodogram(inp, fs=200)
+f1, Pxx1 = signal.welch(inp, fs=200, nperseg=1024) ## another method to compute PS
+m_i = max(Pxx1)   ### finding maximum from the power spectrum array
+mi_index = np.argmax(Pxx1) ### finding index of maxm value of power spectrum 
+
+
+# f2, Pxx2 = signal.periodogram(out, fs= 200)
+f2, Pxx2 = signal.welch(out, fs=200, nperseg=1024) ## another method to compute PS
+m_o = max(Pxx2)
+mo_index = np.argmax(Pxx2)
+
+
+#### finding the value of frequency that represent the maximum Power spectral value
+fi_max = f1[mi_index]  
+fo_max = f2[mo_index]
+
+# l1 = len(f1)
+# l2 = len(Pxx1)
+
+##### Printing some values
+# print(m_i, m_o, mi_index, mo_index, fi_max, fo_max)
+# print(Pxx1[10:15])
+# print(Pxx2[10:15])
+
+
+#### ANalysis of power spectrum
+ps_error = m_i - m_o
+if_error = 1.25 - fi_max
+of_error = 1.25 - fo_max
+
+print(ps_error, if_error, of_error)
+# print(fi_max, fo_max)
+
+# Plot the power spectrum
+plt.figure(figsize=(12, 4))
+
+plt.plot(f1[:20], Pxx1[:20], linestyle = '--', label = 'input')
+plt.plot(fi_max,m_i, 'bo')
+
+plt.plot(f2[:20],Pxx2[:20], label = 'output')
+plt.plot(fo_max,m_o, 'ro')
+
+plt.xlabel('Frequency [Hz]')
+plt.ylabel('Power spectrum / amplitude')
+plt.legend()
+
+plt.grid(True)
+plt.grid(which='minor', linewidth=0.8)
+
+plt.tight_layout()
+
+plt.text(3.10,1125,"fi=" + str(fi_max) +"\n" "fo=" +str(fo_max), fontsize=12)
+
+plt.show()
+
+#### FInding the cross-correlation of the data
+
+corr = np.correlate(inp, out, mode='full')
+# print(max(corr))
+lags = signal.correlation_lags(len(inp), len(out))
+
+plt.figure(figsize=(12, 4))
+
+plt.plot(lags/1000, corr/100000)
+plt.grid(True)
+plt.title('Cross-correlation of input and output data')
+plt.xlabel('Lag(x10^3)')
+plt.ylabel('Correlation(x10^4)')
+# plt.ylim(-850000, 850000)
+# plt.xlim(-2000, 2000)
+
+plt.savefig('cross_correlation.png', dpi=720)
+plt.tight_layout()
+plt.show()
